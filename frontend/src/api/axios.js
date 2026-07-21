@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -16,19 +16,15 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Response interceptor to handle token expiry / error globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Clean token if unauthorized
+    if (error.response?.status === 401) {
       localStorage.removeItem('learnplus_token');
-      // We could redirect to login here if needed, but we let AuthContext manage auth state.
     }
     return Promise.reject(error);
   }
